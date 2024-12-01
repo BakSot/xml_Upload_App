@@ -125,16 +125,18 @@
 
 import { useDropzone } from "react-dropzone";
 import parseXmlToTreeData from "../utils/xmlParser";
-import { useCallback } from "react";
+import React, { useCallback } from "react";
+import { Container } from "@mui/material";
 
 interface FileUploadProps {
   onFileUpload: (data: any) => void;
 }
 
-const FileUploadComponent: React.FC<FileUploadProps> = ({ onFileUpload }) => {
+const FileUploadNew: React.FC<FileUploadProps> = ({ onFileUpload }) => {
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       const file = acceptedFiles[0]; // Handle the first file (single-file support)
+      console.log("file", file);
       if (file) {
         const reader = new FileReader();
         reader.onload = () => {
@@ -154,28 +156,30 @@ const FileUploadComponent: React.FC<FileUploadProps> = ({ onFileUpload }) => {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: ".xml", // Restrict to XML files
+    accept: { "text/xml": [".xml"] }, // Restrict to XML files
     multiple: false, // Only allow single file uploads
   });
 
   return (
-    <div
-      {...getRootProps()}
-      style={{
-        border: "2px dashed gray",
-        borderRadius: "5px",
-        padding: "20px",
-        textAlign: "center",
-      }}
-    >
-      <input {...getInputProps()} />
-      {isDragActive ? (
-        <p>Drop the file here...</p>
-      ) : (
-        <p>Drag and drop an XML file here, or click to select one</p>
-      )}
-    </div>
+    <Container>
+      <div
+        {...getRootProps()}
+        style={{
+          border: "2px dashed gray",
+          borderRadius: "5px",
+          padding: "20px",
+          textAlign: "center",
+        }}
+      >
+        <input {...getInputProps()} />
+        {isDragActive ? (
+          <p>Drop the file here...</p>
+        ) : (
+          <p>Drag and drop an XML file here, or click to select one</p>
+        )}
+      </div>
+    </Container>
   );
 };
 
-export default FileUploadComponent;
+export default FileUploadNew;

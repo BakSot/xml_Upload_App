@@ -1,6 +1,5 @@
 import { useDropzone } from "react-dropzone";
 import { fileTypeController, FileTypesEnum } from "../utils/helpers";
-import { useDispatch } from "react-redux";
 
 interface UseFileDropzoneProps {
   // setFile: (files: Blob, name: string) => void;
@@ -14,8 +13,6 @@ const useFileDropzone = ({
   allowedFileTypes,
   maxFiles = 1,
 }: UseFileDropzoneProps) => {
-  const dispatch = useDispatch();
-
   const fileNameMaxCharLength = 20;
 
   const { getRootProps, getInputProps, isDragAccept, fileRejections } =
@@ -36,27 +33,30 @@ const useFileDropzone = ({
             resolve(file);
           }
         });
-
+        console.log("Does it ever enter here?", file);
         promises.push(promise);
 
         return await Promise.all(promises);
       },
 
-      // validator: (file: File) => {
-      //   const fileType = fileTypeController(file.name);
-      //   if (!allowedFileTypes?.includes(fileType as FileTypesEnum)) {
-      //     return {
-      //       code: "file-invalid-type",
-      //       message: "The type of the file is not allowed",
-      //     };
-      //   }
+      validator: (file: File) => {
+        const fileType = fileTypeController(file.name);
+        console.log(file);
+        if (!allowedFileTypes?.includes(fileType as FileTypesEnum)) {
+          console.log("validator?");
+          return {
+            code: "file-invalid-type",
+            message: "The type of the file is not allowed",
+          };
+        }
 
-      //   if (file?.name?.length > fileNameMaxCharLength) {
-      //     const errorMessage = `The name of the file is too long. Maximum length allowed is ${fileNameMaxCharLength.toString()} characters and the actual length is ${file?.name.length.toString()}`;
-      //     return { code: "file-name-too-long", message: errorMessage };
-      //   }
-      //   return null;
-      // },
+        if (file?.name?.length > fileNameMaxCharLength) {
+          console.log("entered too long name");
+          const errorMessage = `The name of the file is too long. Maximum length allowed is ${fileNameMaxCharLength.toString()} characters and the actual length is ${file?.name.length.toString()}`;
+          return { code: "file-name-too-long", message: errorMessage };
+        }
+        return null;
+      },
       onDrop: (files) => {
         if (files?.length > 0) {
           // setFile(files[0], files[0]?.name);
