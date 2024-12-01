@@ -1,13 +1,21 @@
 import React, { useState } from "react";
-import FileUploadNew from "./components/FileUploadNew";
+import FileUpload from "./components/FileUpload";
 import TreeView from "./components/TreeView";
-import { Button, Container } from "@mui/material";
+import { Container } from "@mui/material";
+import { VisualizeBtn } from "./styled";
+
+export interface TreeData {
+  name: string;
+  attributes?: { [key: string]: string };
+  children?: TreeData[];
+  value?: string;
+}
 
 const App: React.FC = () => {
-  const [treeData, setTreeData] = useState<{}>();
+  const [treeData, setTreeData] = useState<TreeData | null>(null);
   const [showTree, setShowTree] = useState(false);
 
-  const handleFileUpload = (parsedData: {}) => {
+  const handleFileUpload = (parsedData: TreeData) => {
     setTreeData(parsedData);
   };
 
@@ -15,19 +23,13 @@ const App: React.FC = () => {
     treeData && setShowTree(true);
   };
 
-  console.log("treeData", treeData);
-
   return (
     <Container>
       <h1>XML Tree Viewer</h1>
-      <FileUploadNew onFileUpload={handleFileUpload} />
-      <Button
-        sx={{ margin: "20px" }}
-        variant="outlined"
-        onClick={visualizeHandler}
-      >
+      <FileUpload onFileUpload={handleFileUpload} />
+      <VisualizeBtn variant="outlined" onClick={visualizeHandler}>
         Visualize XML
-      </Button>
+      </VisualizeBtn>
       {treeData && showTree && <TreeView data={treeData} />}
     </Container>
   );

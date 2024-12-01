@@ -1,20 +1,21 @@
-import { Typography } from "@mui/material";
 import React from "react";
-import Tree from "react-d3-tree";
+import Tree, { RawNodeDatum, TreeNodeDatum } from "react-d3-tree";
+import { StyledDiv, StyledTypography } from "../styled";
 
-interface TreeViewProps {
-  data: any;
+// Define the type for TreeViewProps, ensuring 'data' can be either a single RawNodeDatum or an array of RawNodeDatum.
+export interface TreeViewProps {
+  data: RawNodeDatum | RawNodeDatum[]; // Define the type for the data prop
 }
 
-const TreeView: React.FC<TreeViewProps> = ({ data }: { data: any }) => {
-  const containerStyles = {
-    width: "100%",
-    height: "800px",
-    border: "1px solid #ccc",
-    borderRadius: "4px",
-  };
-
-  const renderCustomNode = ({ nodeDatum, toggleNode }) => (
+const TreeView: React.FC<TreeViewProps> = ({ data }) => {
+  // Define the custom rendering logic for tree nodes
+  const renderCustomNode = ({
+    nodeDatum, // Node data passed by react-d3-tree
+    toggleNode, // Function to toggle the visibility of child nodes (expand/collapse)
+  }: {
+    nodeDatum: TreeNodeDatum; // Node data of type TreeNodeDatum
+    toggleNode: () => void; // Toggle function to control node expansion
+  }) => (
     <g>
       {/* Node circle */}
       <circle r={10} onClick={toggleNode} />
@@ -25,33 +26,24 @@ const TreeView: React.FC<TreeViewProps> = ({ data }: { data: any }) => {
       {/* Scrollable attributes */}
       {nodeDatum.attributes && (
         <foreignObject x={20} y={20} width={150} height={200}>
-          <Typography
-            sx={{
-              overflow: "auto",
-              border: "1px solid #ccc",
-              borderRadius: "4px",
-              padding: "4px",
-              margin: "10px",
-              fontSize: "12px",
-            }}
-          >
+          <StyledTypography tabIndex={0}>
             {Object.entries(nodeDatum.attributes).map(([key, value]) => (
-              <>{`${key}: ${value}`}</>
+              <span key={key}>{`${key}: ${value}`}</span>
             ))}
-          </Typography>
+          </StyledTypography>
         </foreignObject>
       )}
     </g>
   );
 
   return (
-    <div style={containerStyles}>
+    <StyledDiv>
       <Tree
         data={data}
         orientation="vertical"
         renderCustomNodeElement={renderCustomNode}
       />
-    </div>
+    </StyledDiv>
   );
 };
 
