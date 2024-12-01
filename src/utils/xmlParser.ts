@@ -23,10 +23,10 @@ const parseXmlToTreeData = (node: Element): TreeNode => {
     return attrs; // Return the attributes object
   };
 
-  // Recursive function to parse an XML node into a TreeNode structure
+  // parseNode function parses an XML node into a TreeNode structure
   const parseNode = (node: Element): TreeNode => {
-    // Parse the children of the node, recursively converting each child node into a TreeNode
-    const children = Array.from(node.children).map(parseNode); // Convert child elements to TreeNode[] (recursive call)
+    // Parse the children of the node, converting each child node into a TreeNode
+    const children = Array.from(node.children).map(parseNode); // Convert child elements to TreeNode[]
     // Parse the attributes of the current node (if any)
     const attributes = parseAttributes(node.attributes);
 
@@ -36,7 +36,7 @@ const parseXmlToTreeData = (node: Element): TreeNode => {
       attributes: Object.keys(attributes).length ? attributes : undefined, // If the node has attributes, add them
       children: children.length ? children : undefined, // If the node has children, add them as well
       value:
-        node.childNodes.length === 1 && // Check if the node has only one child (text node)
+        node.childNodes.length === 1 && // Check if the node has only one child
         node.firstChild?.nodeType === Node.TEXT_NODE
           ? node.textContent || undefined // If it's a text node, extract its content
           : undefined, // Otherwise, the value is undefined
