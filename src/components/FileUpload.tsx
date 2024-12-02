@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import parseXmlToTreeData from "../utils/xmlParser";
 import { Container } from "@mui/material";
-import { FileUploadDiv } from "../styled";
+import { ErrorTypo, FileUploadDiv } from "../styled";
 import { TreeData } from "../App";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 
@@ -14,6 +14,7 @@ interface FileUploadProps {
 const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
   // State to hold the uploaded file's name
   const [fileName, setFileName] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
 
   // onDrop callback to handle file drops
   const onDrop = useCallback(
@@ -24,17 +25,31 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
         // Create a new FileReader instance to read the file
         const reader = new FileReader();
         reader.onload = () => {
-          // Create a new DOMParser instance to parse XML
-          const parser = new DOMParser();
-          // Parse the file content into an XML document
-          const xmlDoc = parser.parseFromString(
-            reader.result as string,
-            "application/xml"
-          );
-          // Parse the XML document into tree data format
-          const treeData = parseXmlToTreeData(xmlDoc.documentElement);
-          // Call onFileUpload prop with the parsed tree data
-          onFileUpload(treeData);
+          try {
+            // Create a new DOMParser instance to parse XML
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(
+              reader.result as string,
+              "application/xml"
+            );
+
+            // Check for parser errors
+            const parseError = xmlDoc.querySelector("parsererror");
+            if (parseError) {
+              throw new Error(parseError.textContent || "Invalid XML file.");
+            }
+
+            // Parse the XML document into tree data format
+            const treeData = parseXmlToTreeData(xmlDoc.documentElement);
+            // Call onFileUpload prop with the parsed tree data
+            onFileUpload(treeData);
+            setError(null); // Clear any existing errors
+          } catch (err) {
+            setError(
+              (err as Error).message ||
+                "An unknown error occurred while parsing the XML file."
+            );
+          }
         };
         // Read the file as text
         reader.readAsText(file);
@@ -71,6 +86,8 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
           <p>Drag and drop an XML file here, or click to select one</p>
         )}
       </FileUploadDiv>
+      {/* Display error message */}
+      {error && <ErrorTypo>{error}</ErrorTypo>}
     </Container>
   );
 };

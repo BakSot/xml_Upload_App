@@ -24,3 +24,7 @@ export const FileUploadDiv = styled("div")({
   padding: "20px",
   textAlign: "center",
 });
+
+export const ErrorTypo = styled(Typography)({
+  color: "red",
+});
