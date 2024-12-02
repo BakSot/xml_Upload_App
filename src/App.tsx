@@ -1,35 +1,38 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from "react";
+import FileUpload from "./components/FileUpload";
+import TreeView from "./components/TreeView";
+import { Container } from "@mui/material";
+import { VisualizeBtn } from "./styled";
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+export interface TreeData {
+  name: string;
+  attributes?: { [key: string]: string };
+  children?: TreeData[];
+  value?: string;
 }
 
-export default App
+const App: React.FC = () => {
+  const [treeData, setTreeData] = useState<TreeData | null>(null);
+  const [showTree, setShowTree] = useState(false);
+
+  const handleFileUpload = (parsedData: TreeData) => {
+    setTreeData(parsedData);
+  };
+
+  const visualizeHandler = () => {
+    treeData && setShowTree(true);
+  };
+
+  return (
+    <Container>
+      <h1>XML Tree Viewer</h1>
+      <FileUpload onFileUpload={handleFileUpload} />
+      <VisualizeBtn variant="outlined" onClick={visualizeHandler}>
+        Visualize XML
+      </VisualizeBtn>
+      {treeData && showTree && <TreeView data={treeData} />}
+    </Container>
+  );
+};
+
+export default App;
